@@ -1,8 +1,9 @@
 package org.renwixx.yawl;
 
 import com.moandjiezana.toml.Toml;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.slf4j.Logger;
 
@@ -11,27 +12,23 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Manages loading and providing localized messages from .toml files.
- */
 public class LocaleManager {
-
+    private final Yawl plugin;
     private final Path localesDirectory;
-    private final String locale;
+    private String locale;
     private final Logger logger;
-    private final MiniMessage miniMessage;
     private Toml messages;
 
-    public LocaleManager(Path dataDirectory, String locale, Logger logger, MiniMessage miniMessage) {
+    public LocaleManager(Path dataDirectory, Yawl plugin, String locale, Logger logger) {
         this.localesDirectory = dataDirectory.resolve("locales");
+        this.plugin = plugin;
         this.locale = locale;
         this.logger = logger;
-        this.miniMessage = miniMessage;
-        loadMessages();
+        reload();
     }
 
-    private void loadMessages() {
-        // Save default locales if they don't exist
+    public void reload() {
+        // Save default locales if missing
         saveDefaultLocale("en");
         saveDefaultLocale("ru");
 
@@ -46,7 +43,7 @@ public class LocaleManager {
             logger.info("Successfully loaded messages from '{}'.", localeFile.getFileName());
         } catch (Exception e) {
             logger.error("Failed to load locale file '{}'. Using empty messages.", localeFile.getFileName(), e);
-            this.messages = new Toml(); // Avoid NullPointerException
+            this.messages = new Toml();
         }
     }
 
@@ -70,25 +67,43 @@ public class LocaleManager {
         }
     }
 
-    /**
-     * Gets a message string from the loaded locale file.
-     *
-     * @param key The key of the message (e.g., "kick-message").
-     * @return The message string.
-     */
+    public Component getMessageFor(CommandSource source, String key, TagResolver... placeholders) {
+        if (!plugin.shouldUseClientLocale()) {
+            return getMessage(key, placeholders);
+        }
+
+        String lang = null;
+
+        if (source instanceof Player player) {
+            if (player.getPlayerSettings().getLocale() != null) {
+                lang = player.getPlayerSettings().getLocale().getLanguage();
+            }
+        }
+
+        if (lang != null && Files.exists(localesDirectory.resolve(lang + ".toml"))) {
+            try {
+                Toml localMessages = new Toml().read(localesDirectory.resolve(lang + ".toml").toFile());
+                String msg = localMessages.getString(key, messages.getString(key, key));
+                return Yawl.MINI_MESSAGE.deserialize(msg, placeholders);
+            } catch (Exception e) {
+                logger.warn("Failed to load messages for '{}', using default locale.", lang, e);
+            }
+        }
+
+        return getMessage(key, placeholders);
+    }
+
     public String getMessageString(String key) {
         return messages.getString(key, "<red>Missing message for key: " + key + "</red>");
     }
 
-    /**
-     * Deserializes a message from the locale file into a Component.
-     *
-     * @param key          The key of the message.
-     * @param placeholders Placeholders to be applied using MiniMessage.
-     * @return The formatted Component.
-     */
     public Component getMessage(String key, TagResolver... placeholders) {
         String message = getMessageString(key);
-        return miniMessage.deserialize(message, placeholders);
+        return Yawl.MINI_MESSAGE.deserialize(message, placeholders);
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+        reload();
     }
 }

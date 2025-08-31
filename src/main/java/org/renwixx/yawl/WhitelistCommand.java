@@ -8,8 +8,8 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -18,9 +18,6 @@ import java.util.StringJoiner;
 public final class WhitelistCommand {
 
     public static BrigadierCommand create(final Yawl plugin) {
-        final Logger logger = plugin.getLogger();
-        final PluginConfig config = plugin.getConfig();
-
         LiteralArgumentBuilder<CommandSource> builder = LiteralArgumentBuilder.<CommandSource>literal("yawl")
                 .executes(context -> {
                     context.getSource().sendMessage(plugin.getLocaleManager().getMessage("help-message"));
@@ -28,53 +25,62 @@ public final class WhitelistCommand {
                 });
 
         var addCommand = LiteralArgumentBuilder.<CommandSource>literal("add")
-                .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.greedyString())
+                .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
                         .executes(context -> {
                             CommandSource source = context.getSource();
                             LocaleManager locale = plugin.getLocaleManager();
                             if (!source.hasPermission(Permissions.ADD)) {
-                                source.sendMessage(locale.getMessage("no-permission"));
+                                source.sendMessage(locale.getMessageFor(source, "no-permission"));
                                 return Command.SINGLE_SUCCESS;
                             }
 
                             String playerName = context.getArgument("player", String.class).trim();
                             if (plugin.addPlayer(playerName)) {
-                                sendMessageToSource(source, logger, locale.getMessage("player-added",
-                                        Placeholder.unparsed("player", playerName)), plugin);
+                                sendMessageToSource(source, locale.getMessageFor(source, "player-added",
+                                                Placeholder.unparsed("player", playerName)), plugin);
                             } else {
-                                sendMessageToSource(source, logger, locale.getMessage("player-already-exists",
-                                        Placeholder.unparsed("player", playerName)), plugin);
+                                sendMessageToSource(source, locale.getMessageFor(source, "player-already-exists",
+                                                Placeholder.unparsed("player", playerName)), plugin);
                             }
                             return Command.SINGLE_SUCCESS;
                         })
                 );
 
         var removeCommand = LiteralArgumentBuilder.<CommandSource>literal("remove")
-                .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.greedyString())
+                .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
                         .suggests((context, suggestionBuilder) -> {
-                            List<String> whitelistedPlayers = plugin.getWhitelistedPlayers();
-                            String input = suggestionBuilder.getRemaining().toLowerCase();
-                            whitelistedPlayers.stream()
-                                    .filter(playerName -> playerName.toLowerCase().startsWith(input))
+                            List<String> players = plugin.getWhitelistedPlayers();
+                            String input = suggestionBuilder.getRemaining();
+                            players.stream()
+                                    .filter(name -> plugin.getConfig().isCaseSensitive()
+                                            ? name.startsWith(input)
+                                            : name.toLowerCase().startsWith(input.toLowerCase()))
                                     .forEach(suggestionBuilder::suggest);
-
                             return suggestionBuilder.buildFuture();
                         })
                         .executes(context -> {
                             CommandSource source = context.getSource();
                             LocaleManager locale = plugin.getLocaleManager();
                             if (!source.hasPermission(Permissions.REMOVE)) {
-                                source.sendMessage(locale.getMessage("no-permission"));
+                                source.sendMessage(locale.getMessageFor(source, "no-permission"));
                                 return Command.SINGLE_SUCCESS;
                             }
 
-                            String playerName = context.getArgument("player", String.class);
+                            String playerName = context.getArgument("player", String.class).trim();
+
+                            if (!(source instanceof ConsoleCommandSource)
+                                    && source instanceof com.velocitypowered.api.proxy.Player player
+                                    && player.getUsername().equalsIgnoreCase(playerName)) {
+                                sendMessageToSource(source, locale.getMessageFor(source, "cannot-remove-self"), plugin);
+                                return Command.SINGLE_SUCCESS;
+                            }
+
                             if (plugin.removePlayer(playerName)) {
-                                sendMessageToSource(source, logger, locale.getMessage("player-removed",
+                                sendMessageToSource(source, locale.getMessageFor(source, "player-removed",
                                         Placeholder.unparsed("player", playerName)), plugin);
                             } else {
-                                sendMessageToSource(source, logger, locale.getMessage("player-not-found",
-                                        Placeholder.unparsed("player", playerName)), plugin);
+                                sendMessageToSource(source, locale.getMessageFor(source, "player-not-found",
+                                                Placeholder.unparsed("player", playerName)), plugin);
                             }
                             return Command.SINGLE_SUCCESS;
                         })
@@ -85,17 +91,17 @@ public final class WhitelistCommand {
                     CommandSource source = context.getSource();
                     LocaleManager locale = plugin.getLocaleManager();
                     if (!source.hasPermission(Permissions.LIST)) {
-                        source.sendMessage(locale.getMessage("no-permission"));
+                        source.sendMessage(locale.getMessageFor(source, "no-permission"));
                         return Command.SINGLE_SUCCESS;
                     }
 
                     List<String> players = plugin.getWhitelistedPlayers();
                     if (players.isEmpty()) {
-                        sendMessageToSource(source, logger, locale.getMessage("list-empty"), plugin);
+                        sendMessageToSource(source, locale.getMessageFor(source, "list-empty"), plugin);
                     } else {
                         StringJoiner joiner = new StringJoiner(", ");
                         players.forEach(joiner::add);
-                        sendMessageToSource(source, logger, locale.getMessage("list-header",
+                        sendMessageToSource(source, locale.getMessageFor(source, "list-header",
                                 Placeholder.unparsed("count", String.valueOf(players.size())),
                                 Placeholder.unparsed("players", joiner.toString())), plugin);
                     }
@@ -106,11 +112,11 @@ public final class WhitelistCommand {
                 .executes(context -> {
                     CommandSource source = context.getSource();
                     if (!source.hasPermission(Permissions.RELOAD)) {
-                        source.sendMessage(plugin.getLocaleManager().getMessage("no-permission"));
+                        source.sendMessage(plugin.getLocaleManager().getMessageFor(source, "no-permission"));
                         return Command.SINGLE_SUCCESS;
                     }
                     plugin.reload();
-                    sendMessageToSource(source, logger, plugin.getLocaleManager().getMessage("reload-success"), plugin);
+                    sendMessageToSource(source, plugin.getLocaleManager().getMessageFor(source, "reload-success"), plugin);
                     return Command.SINGLE_SUCCESS;
                 });
 
@@ -122,10 +128,11 @@ public final class WhitelistCommand {
         return new BrigadierCommand(builder);
     }
 
-    private static void sendMessageToSource(CommandSource source, Logger logger, Component message, Yawl plugin) {
+    private static void sendMessageToSource(CommandSource source, Component message, Yawl plugin) {
         if (source instanceof ConsoleCommandSource) {
-            MiniMessage miniMessage = plugin.getMiniMessage();
-            logger.info(miniMessage.stripTags(miniMessage.serialize(message)));
+            Logger logger = plugin.getLogger();
+            String plain = PlainTextComponentSerializer.plainText().serialize(message);
+            logger.info(plain);
         } else {
             source.sendMessage(message);
         }

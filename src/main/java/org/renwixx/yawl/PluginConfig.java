@@ -12,6 +12,7 @@ public class PluginConfig {
     private final boolean enabled;
     private final String locale;
     private final boolean caseSensitive;
+    private final boolean useClientLocale;
 
     public PluginConfig(Path dataDirectory, Logger logger) {
         Path configFile = saveDefaultConfig(dataDirectory, logger);
@@ -25,6 +26,7 @@ public class PluginConfig {
         this.enabled = toml.getBoolean("settings.enabled", true);
         this.locale = toml.getString("settings.locale", "en");
         this.caseSensitive = toml.getBoolean("settings.case-sensitive", false);
+        this.useClientLocale = toml.getBoolean("settings.use-client-locale", false);
     }
 
     private Path saveDefaultConfig(Path dataDirectory, Logger logger) {
@@ -57,5 +59,9 @@ public class PluginConfig {
 
     public boolean isCaseSensitive() {
         return caseSensitive;
+    }
+
+    public boolean isUseClientLocale() {
+        return useClientLocale;
     }
 }

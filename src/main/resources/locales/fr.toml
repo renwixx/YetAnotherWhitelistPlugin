@@ -1,0 +1,18 @@
+# Variables: <player>, <count>, <players>
+kick-message = "<red>Vous n'êtes pas sur la whitelist de ce serveur !</red>"
+player-added = "<gray>Le joueur <green><player></green> a été ajouté à la whitelist.</gray>"
+player-already-exists = "<gray>Le joueur <yellow><player></yellow> est déjà dans la whitelist.</gray>"
+player-removed = "<gray>Le joueur <red><player></red> a été retiré de la whitelist.</gray>"
+player-not-found = "<gray>Le joueur <yellow><player></yellow> n'est pas dans la whitelist.</gray>"
+list-header = "<gold>Joueurs en whitelist (<count>) :</gold><white> <players>"
+list-empty = "<yellow>La whitelist est vide.</yellow>"
+no-permission = "<red>Vous n'avez pas la permission d'utiliser cette commande.</red>"
+help-message = """
+<gold>Commandes YAWL :</gold>
+<yellow>/yawl add <player></yellow> - Ajoute un joueur à la whitelist.
+<yellow>/yawl remove <player></yellow> - Retire un joueur de la whitelist.
+<yellow>/yawl list</yellow> - Affiche tous les joueurs en whitelist.
+<yellow>/yawl reload</yellow> - Recharge la configuration et la whitelist.
+"""
+reload-success = "<green>Whitelist et configuration rechargées avec succès.</green>"
+cannot-remove-self = "<red>Vous ne pouvez pas vous retirer vous-même de la whitelist !</red>"
