@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class LocaleManager {
     private final Yawl plugin;
@@ -18,6 +19,9 @@ public class LocaleManager {
     private String locale;
     private final Logger logger;
     private Toml messages;
+    private static final List<String> SUPPORTED_LOCALES = List.of(
+            "en", "ru", "uk", "de", "fr", "es", "ar", "zh-cn", "ja"
+    );
 
     public LocaleManager(Path dataDirectory, Yawl plugin, String locale, Logger logger) {
         this.localesDirectory = dataDirectory.resolve("locales");
@@ -29,8 +33,7 @@ public class LocaleManager {
 
     public void reload() {
         // Save default locales if missing
-        saveDefaultLocale("en");
-        saveDefaultLocale("ru");
+        SUPPORTED_LOCALES.forEach(this::saveDefaultLocale);
 
         Path localeFile = localesDirectory.resolve(locale + ".toml");
         if (!Files.exists(localeFile)) {

@@ -12,7 +12,7 @@ locale = "en"
 
 # If true and the client has a language set that exists in the plugin's locales folder, it will be displayed.
 # If false, it will display default locale defined by upper setting.
-use-client-locale = true
+use-client-locale = false
 
 # If true, player names in the whitelist will be case-sensitive (e.g., "Player" is different from "player").
 # If false, case will be ignored ("Player" and "player" are the same).
