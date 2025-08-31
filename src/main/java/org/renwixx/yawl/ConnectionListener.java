@@ -4,13 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.proxy.Player;
 
-public class ConnectionListener {
-
-    private final Yawl plugin;
-
-    public ConnectionListener(Yawl plugin) {
-        this.plugin = plugin;
-    }
+public record ConnectionListener(Yawl plugin) {
 
     @Subscribe
     public void onPlayerLogin(LoginEvent event) {
@@ -19,11 +13,15 @@ public class ConnectionListener {
         }
 
         Player player = event.getPlayer();
+        if (player.hasPermission(Permissions.BYPASS)) {
+            return;
+        }
+
         String playerName = player.getUsername();
 
         if (!plugin.isWhitelisted(playerName)) {
             event.setResult(LoginEvent.ComponentResult.denied(
-                    plugin.getMiniMessage().deserialize(plugin.getConfig().getMessages().getKickMessage())
+                    plugin.getLocaleManager().getMessage("kick-message")
             ));
         }
     }

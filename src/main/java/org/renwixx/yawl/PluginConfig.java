@@ -1,53 +1,61 @@
 package org.renwixx.yawl;
 
 import com.moandjiezana.toml.Toml;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PluginConfig {
-
     private final boolean enabled;
-    private final Messages messages;
+    private final String locale;
+    private final boolean caseSensitive;
 
-    public PluginConfig(Toml toml) {
+    public PluginConfig(Path dataDirectory, Logger logger) {
+        Path configFile = saveDefaultConfig(dataDirectory, logger);
+        Toml toml;
+        if (configFile != null) {
+            toml = new Toml().read(configFile.toFile());
+        } else {
+            toml = new Toml();
+        }
+
         this.enabled = toml.getBoolean("settings.enabled", true);
-        this.messages = new Messages(toml.getTable("messages"));
+        this.locale = toml.getString("settings.locale", "en");
+        this.caseSensitive = toml.getBoolean("settings.case-sensitive", false);
+    }
+
+    private Path saveDefaultConfig(Path dataDirectory, Logger logger) {
+        Path configFile = dataDirectory.resolve("config.toml");
+        if (!Files.exists(configFile)) {
+            try {
+                Files.createDirectories(dataDirectory);
+                try (InputStream in = getClass().getClassLoader().getResourceAsStream("config.toml")) {
+                    if (in == null) {
+                        logger.error("Default config.toml not found in the plugin JAR!");
+                        return null;
+                    }
+                    Files.copy(in, configFile);
+                }
+            } catch (IOException e) {
+                logger.error("Could not create default config.toml!", e);
+                return null;
+            }
+        }
+        return configFile;
     }
 
     public boolean isEnabled() {
         return enabled;
     }
 
-    public Messages getMessages() {
-        return messages;
+    public String getLocale() {
+        return locale;
     }
 
-    public static class Messages {
-        private final String kickMessage;
-        private final String playerAdded;
-        private final String playerAlreadyExists;
-        private final String playerRemoved;
-        private final String playerNotFound;
-        private final String listHeader;
-        private final String listEmpty;
-        private final String noPermission;
-
-        public Messages(Toml toml) {
-            this.kickMessage = toml.getString("kick-message", "<red>Вы не в белом списке этого сервера!");
-            this.playerAdded = toml.getString("player-added", "<gray>Игрок <green>{player}</green> был добавлен в белый список.");
-            this.playerAlreadyExists = toml.getString("player-already-exists", "<gray>Игрок <yellow>{player}</yellow> уже находится в белом списке.");
-            this.playerRemoved = toml.getString("player-removed", "<gray>Игрок <red>{player}</red> был удален из белого списка.");
-            this.playerNotFound = toml.getString("player-not-found", "<gray>Игрока <yellow>{player}</yellow> нет в белом списке.");
-            this.listHeader = toml.getString("list-header", "<gold>Игроки в белом списке ({count}):</gold><white> {players}");
-            this.listEmpty = toml.getString("list-empty", "<yellow>Белый список пуст.");
-            this.noPermission = toml.getString("no-permission", "<red>У вас нет прав для использования этой команды.");
-        }
-
-        public String getKickMessage() { return kickMessage; }
-        public String getPlayerAdded() { return playerAdded; }
-        public String getPlayerAlreadyExists() { return playerAlreadyExists; }
-        public String getPlayerRemoved() { return playerRemoved; }
-        public String getPlayerNotFound() { return playerNotFound; }
-        public String getListHeader() { return listHeader; }
-        public String getListEmpty() { return listEmpty; }
-        public String getNoPermission() { return noPermission; }
+    public boolean isCaseSensitive() {
+        return caseSensitive;
     }
 }

@@ -1,29 +1,32 @@
 package org.renwixx.yawl;
 
 import com.google.inject.Inject;
-import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 @Plugin(id = "yetanotherwhitelistplugin",
         name = "yawl",
-        version = org.renwixx.yawl.BuildConstants.VERSION,
+        version = BuildConstants.VERSION,
         description = "Most simple whitelist plugin for Velocity server.",
         url = "https://github.com/renwixx/",
         authors = {"Renwixx"})
@@ -32,10 +35,11 @@ public class Yawl {
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
-    private final List<String> whitelistedPlayers = new CopyOnWriteArrayList<>();
     private final MiniMessage miniMessage;
-
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Set<String> whitelistedPlayers = ConcurrentHashMap.newKeySet();
     private PluginConfig config;
+    private LocaleManager localeManager;
 
     @Inject
     public Yawl(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -47,8 +51,7 @@ public class Yawl {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        loadConfig();
-        loadWhitelist();
+        reload();
 
         server.getEventManager().register(this, new ConnectionListener(this));
 
@@ -59,27 +62,99 @@ public class Yawl {
         logger.info("YAWL (Yet Another Whitelist Plugin) has been enabled!");
     }
 
+    public void reload() {
+        // ИСПРАВЛЕНО: Операции, требующие блокировки, отделены от последующей проверки игроков.
+        lock.writeLock().lock();
+        try {
+            this.config = new PluginConfig(dataDirectory, logger);
+            this.localeManager = new LocaleManager(dataDirectory, config.getLocale(), logger, miniMessage);
+            loadWhitelistInternal();
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        // Проверка и кик игроков выполняются ПОСЛЕ освобождения блокировки.
+        checkAndKickPlayers();
+    }
+
+    public void checkAndKickPlayers() {
+        if (!config.isEnabled()) {
+            return;
+        }
+
+        Component kickMessage = localeManager.getMessage("kick-message");
+        for (Player player : server.getAllPlayers()) {
+            // isWhitelisted использует readLock, что безопасно
+            if (!player.hasPermission(Permissions.BYPASS) && !isWhitelisted(player.getUsername())) {
+                player.disconnect(kickMessage);
+                logger.info("Kicked player {} because they are no longer on the whitelist.", player.getUsername());
+            }
+        }
+    }
+
     public boolean isWhitelisted(String playerName) {
-        return whitelistedPlayers.stream().anyMatch(name -> name.equalsIgnoreCase(playerName));
+        lock.readLock().lock();
+        try {
+            if (config.isCaseSensitive()) {
+                return whitelistedPlayers.contains(playerName);
+            }
+            return whitelistedPlayers.contains(playerName.toLowerCase());
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public List<String> getWhitelistedPlayers() {
-        return Collections.unmodifiableList(whitelistedPlayers);
+        lock.readLock().lock();
+        try {
+            return List.copyOf(whitelistedPlayers);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean addPlayer(String playerName) {
-        if (isWhitelisted(playerName)) {
-            return false; // Игрок уже в списке
+        lock.writeLock().lock();
+        try {
+            String processedName = playerName.trim();
+            if (processedName.isEmpty()) return false;
+
+            String nameToAdd = config.isCaseSensitive() ? processedName : processedName.toLowerCase();
+            boolean added = whitelistedPlayers.add(nameToAdd);
+
+            if (added) {
+                saveWhitelistInternal();
+            }
+            return added;
+        } finally {
+            lock.writeLock().unlock();
         }
-        whitelistedPlayers.add(playerName);
-        saveWhitelist();
-        return true;
     }
 
     public boolean removePlayer(String playerName) {
-        boolean removed = whitelistedPlayers.removeIf(name -> name.equalsIgnoreCase(playerName));
+        // ИСПРАВЛЕНО: Логика кика игрока полностью вынесена за пределы блокировки.
+        String processedName = playerName.trim();
+        boolean removed;
+
+        lock.writeLock().lock();
+        try {
+            String nameToRemove = config.isCaseSensitive() ? processedName : processedName.toLowerCase();
+            removed = whitelistedPlayers.remove(nameToRemove);
+            if (removed) {
+                saveWhitelistInternal();
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        // Кик происходит только если игрок был успешно удален и ПОСЛЕ освобождения блокировки.
         if (removed) {
-            saveWhitelist();
+            server.getPlayer(playerName).ifPresent(player -> {
+                if (!player.hasPermission(Permissions.BYPASS)) {
+                    player.disconnect(localeManager.getMessage("kick-message"));
+                    logger.info("Kicked player {} because they were removed from the whitelist.", player.getUsername());
+                }
+            });
         }
         return removed;
     }
@@ -88,12 +163,12 @@ public class Yawl {
         return dataDirectory.resolve("whitelist.txt");
     }
 
-    public void loadWhitelist() {
+    private void loadWhitelistInternal() {
         Path file = getWhitelistPath();
         if (!Files.exists(file)) {
             try {
                 Files.createDirectories(dataDirectory);
-                Files.write(file, List.of("# Add one player per line", "Player1", "YourNickname"));
+                Files.write(file, List.of("# Add one player per line", "Player1"));
             } catch (IOException e) {
                 logger.error("Could not create whitelist.txt", e);
                 return;
@@ -103,58 +178,46 @@ public class Yawl {
         try {
             whitelistedPlayers.clear();
             List<String> lines = Files.readAllLines(file);
-            whitelistedPlayers.addAll(
-                    lines.stream()
-                            .map(String::trim)
-                            .filter(line -> !line.isEmpty() && !line.startsWith("#"))
-                            .toList()
-            );
+            Set<String> newWhitelist = lines.stream()
+                    .map(String::trim)
+                    .filter(line -> !line.isEmpty() && !line.startsWith("#"))
+                    .map(name -> config.isCaseSensitive() ? name : name.toLowerCase())
+                    .collect(Collectors.toSet());
+
+            whitelistedPlayers.addAll(newWhitelist);
             logger.info("Loaded {} players from whitelist.txt", whitelistedPlayers.size());
         } catch (IOException e) {
             logger.error("Could not load whitelist.txt", e);
         }
     }
 
-    public void saveWhitelist() {
+    // ИЗМЕНЕНО: Метод сохранения файла переписан для атомарности.
+    private void saveWhitelistInternal() {
         Path file = getWhitelistPath();
+        Path tempFile = dataDirectory.resolve("whitelist.txt.tmp");
+
         try {
-            Files.write(file, whitelistedPlayers);
+            List<String> sortedPlayers = whitelistedPlayers.stream()
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .toList();
+
+            Files.write(tempFile, sortedPlayers);
+
+            // Атомарно заменяем старый файл новым, чтобы избежать повреждения данных
+            Files.move(tempFile, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             logger.error("Could not save whitelist.txt", e);
-        }
-    }
-
-    private void loadConfig() {
-        File configFile = new File(dataDirectory.toFile(), "config.toml");
-
-        if (!configFile.exists()) {
+            // Пытаемся удалить временный файл в случае ошибки
             try {
-                Files.createDirectories(dataDirectory);
-                try (InputStream in = getClass().getClassLoader().getResourceAsStream("config.toml")) {
-                    if (in == null) {
-                        logger.error("Default config.toml not found in the plugin JAR!");
-                        return;
-                    }
-                    Files.copy(in, configFile.toPath());
-                }
-            } catch (IOException e) {
-                logger.error("Could not create default config.toml!", e);
-                return;
+                Files.deleteIfExists(tempFile);
+            } catch (IOException ignored) {
+                // Игнорируем ошибку удаления, так как исходная ошибка важнее
             }
         }
-
-        try {
-            Toml toml = new Toml().read(configFile);
-            this.config = new PluginConfig(toml);
-            logger.info("Configuration loaded successfully.");
-        } catch (Exception e) {
-            logger.error("Failed to load config.toml. Using default values.", e);
-            this.config = new PluginConfig(new Toml()); // Загрузка с дефолтными значениями
-        }
     }
 
-    public ProxyServer getServer() { return server; }
     public PluginConfig getConfig() { return config; }
     public MiniMessage getMiniMessage() { return miniMessage; }
+    public LocaleManager getLocaleManager() { return localeManager; }
     public Logger getLogger() { return logger; }
 }
