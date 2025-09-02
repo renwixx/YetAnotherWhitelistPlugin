@@ -1,15 +1,18 @@
-# Marcadores: <player>, <count>, <players>
+# Marcadores: <player>, <count>, <players>, <until>, <duration>
 kick-message = "<red>¡No estás en la whitelist de este servidor!</red>"
 player-added = "<gray>El jugador <green><player></green> ha sido añadido a la whitelist.</gray>"
+player-added-temp = "<gray>El jugador <green><player></green> ha sido añadido a la whitelist hasta <yellow><until></yellow>.</gray>"
 player-already-exists = "<gray>El jugador <yellow><player></yellow> ya está en la whitelist.</gray>"
 player-removed = "<gray>El jugador <red><player></red> ha sido eliminado de la whitelist.</gray>"
 player-not-found = "<gray>El jugador <yellow><player></yellow> no se encuentra en la whitelist.</gray>"
+invalid-duration = "<red>Duración inválida: <yellow><duration></yellow>. Ejemplos: 7d, 30d, 1mo, 1y</red>"
 list-header = "<gold>Jugadores en la whitelist (<count>):</gold><white> <players>"
 list-empty = "<yellow>La whitelist está vacía.</yellow>"
 no-permission = "<red>No tienes permisos para usar este comando.</red>"
 help-message = """
 <gold>Comandos de YAWL:</gold>
-<yellow>/yawl add <player></yellow> - Añade un jugador a la whitelist.
+<yellow>/yawl add <player></yellow> - Añade un jugador permanentemente a la whitelist.
+<yellow>/yawl add <player> <duration></yellow> - Añade un jugador temporalmente (ej.: 7d, 30d, 1mo, 1y).
 <yellow>/yawl remove <player></yellow> - Elimina un jugador de la whitelist.
 <yellow>/yawl list</yellow> - Muestra todos los jugadores en la whitelist.
 <yellow>/yawl reload</yellow> - Recarga la configuración y la whitelist.

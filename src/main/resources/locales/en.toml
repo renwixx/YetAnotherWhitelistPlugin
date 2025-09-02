@@ -1,15 +1,18 @@
 # Placeholders: <player>, <count>, <players>
 kick-message = "<red>You are not whitelisted on this server!"
 player-added = "<gray>Player <green><player></green> has been added to the whitelist."
+player-added-temp = "<gray>Player <green><player></green> has been added to the whitelist until <yellow><until></yellow>."
 player-already-exists = "<gray>Player <yellow><player></yellow> is already on the whitelist."
 player-removed = "<gray>Player <red><player></red> has been removed from the whitelist."
 player-not-found = "<gray>Player <yellow><player></yellow> is not on the whitelist."
+invalid-duration = "<red>Invalid duration: <yellow><duration></yellow>. Examples: 7d, 30d, 1mo, 1y</red>"
 list-header = "<gold>Whitelisted players (<count>):</gold><white> <players>"
 list-empty = "<yellow>The whitelist is empty."
 no-permission = "<red>You do not have permission to use this command."
 help-message = """
 <gold>YAWL Commands:</gold>
-<yellow>/yawl add <player></yellow> - Adds a player to the whitelist.
+<yellow>/yawl add <player></yellow> - Adds a player to the whitelist (permanent).
+<yellow>/yawl add <player> <duration></yellow> - Adds a player temporarily (e.g., 7d, 30d, 1mo, 1y).
 <yellow>/yawl remove <player></yellow> - Removes a player from the whitelist.
 <yellow>/yawl list</yellow> - Lists all whitelisted players.
 <yellow>/yawl reload</yellow> - Reloads the plugin configuration and whitelist.

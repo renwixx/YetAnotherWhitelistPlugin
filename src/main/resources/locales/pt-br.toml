@@ -1,0 +1,21 @@
+# Variáveis: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>Você não está na whitelist deste servidor!</red>"
+player-added = "<gray>O jogador <green><player></green> foi adicionado à whitelist.</gray>"
+player-added-temp = "<gray>O jogador <green><player></green> foi adicionado à whitelist até <yellow><until></yellow>.</gray>"
+player-already-exists = "<gray>O jogador <yellow><player></yellow> já está na whitelist.</gray>"
+player-removed = "<gray>O jogador <red><player></red> foi removido da whitelist.</gray>"
+player-not-found = "<gray>O jogador <yellow><player></yellow> não está na whitelist.</gray>"
+invalid-duration = "<red>Duração inválida: <yellow><duration></yellow>. Exemplos: 7d, 30d, 1mo, 1y</red>"
+list-header = "<gold>Jogadores na whitelist (<count>):</gold><white> <players>"
+list-empty = "<yellow>A whitelist está vazia.</yellow>"
+no-permission = "<red>Você não tem permissão para usar este comando.</red>"
+help-message = """
+<gold>Comandos do YAWL:</gold>
+<yellow>/yawl add <player></yellow> - Adiciona um jogador à whitelist (permanente).
+<yellow>/yawl add <player> <duration></yellow> - Adiciona um jogador temporariamente (ex.: 7d, 30d, 1mo, 1y).
+<yellow>/yawl remove <player></yellow> - Remove um jogador da whitelist.
+<yellow>/yawl list</yellow> - Lista todos os jogadores da whitelist.
+<yellow>/yawl reload</yellow> - Recarrega a configuração e a whitelist.
+"""
+reload-success = "<green>Whitelist e configurações recarregadas com sucesso.</green>"
+cannot-remove-self = "<red>Você não pode se remover da whitelist!</red>"

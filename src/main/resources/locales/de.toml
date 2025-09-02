@@ -1,15 +1,18 @@
-# Platzhalter: <player>, <count>, <players>
+# Platzhalter: <player>, <count>, <players>, <until>, <duration>
 kick-message = "<red>Du bist nicht auf der Whitelist dieses Servers!</red>"
 player-added = "<gray>Spieler <green><player></green> wurde zur Whitelist hinzugefügt.</gray>"
+player-added-temp = "<gray>Spieler <green><player></green> wurde bis <yellow><until></yellow> zur Whitelist hinzugefügt.</gray>"
 player-already-exists = "<gray>Spieler <yellow><player></yellow> ist bereits auf der Whitelist.</gray>"
 player-removed = "<gray>Spieler <red><player></red> wurde von der Whitelist entfernt.</gray>"
 player-not-found = "<gray>Spieler <yellow><player></yellow> wurde nicht auf der Whitelist gefunden.</gray>"
+invalid-duration = "<red>Ungültige Dauer: <yellow><duration></yellow>. Beispiele: 7d, 30d, 1mo, 1y</red>"
 list-header = "<gold>Whitelist-Spieler (<count>):</gold><white> <players>"
 list-empty = "<yellow>Die Whitelist ist leer.</yellow>"
 no-permission = "<red>Du hast keine Berechtigung für diesen Befehl.</red>"
 help-message = """
 <gold>YAWL Befehle:</gold>
-<yellow>/yawl add <player></yellow> - Fügt einen Spieler zur Whitelist hinzu.
+<yellow>/yawl add <player></yellow> - Fügt einen Spieler dauerhaft zur Whitelist hinzu.
+<yellow>/yawl add <player> <duration></yellow> - Fügt einen Spieler temporär hinzu (z. B. 7d, 30d, 1mo, 1y).
 <yellow>/yawl remove <player></yellow> - Entfernt einen Spieler von der Whitelist.
 <yellow>/yawl list</yellow> - Zeigt alle Spieler auf der Whitelist.
 <yellow>/yawl reload</yellow> - Lädt Konfiguration und Whitelist neu.

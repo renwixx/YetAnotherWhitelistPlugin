@@ -1,18 +1,21 @@
-# 占位符: <player>, <count>, <players>
-kick-message = "<red>你不在这个服务器的白名单中！</red>"
-player-added = "<gray>玩家 <green><player></green> 已被加入白名单。</gray>"
+# 占位符: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>你不在本服务器的白名单中！</red>"
+player-added = "<gray>玩家 <green><player></green> 已被添加到白名单。</gray>"
+player-added-temp = "<gray>玩家 <green><player></green> 已被添加到白名单，直到 <yellow><until></yellow>。</gray>"
 player-already-exists = "<gray>玩家 <yellow><player></yellow> 已经在白名单中。</gray>"
-player-removed = "<gray>玩家 <red><player></red> 已被从白名单移除。</gray>"
-player-not-found = "<gray>未在白名单中找到玩家 <yellow><player></yellow>。</gray>"
-list-header = "<gold>白名单玩家 (<count>)：</gold><white> <players>"
+player-removed = "<gray>玩家 <red><player></red> 已从白名单中移除。</gray>"
+player-not-found = "<gray>玩家 <yellow><player></yellow> 不在白名单中。</gray>"
+invalid-duration = "<red>无效的持续时间: <yellow><duration></yellow>。示例: 7d, 30d, 1mo, 1y</red>"
+list-header = "<gold>白名单玩家 (<count>):</gold><white> <players>"
 list-empty = "<yellow>白名单为空。</yellow>"
-no-permission = "<red>你没有使用该命令的权限。</red>"
+no-permission = "<red>你没有权限使用此命令。</red>"
 help-message = """
-<gold>YAWL 命令：</gold>
-<yellow>/yawl add <player></yellow> - 将玩家加入白名单。
-<yellow>/yawl remove <player></yellow> - 将玩家移出白名单。
-<yellow>/yawl list</yellow> - 显示所有白名单玩家。
+<gold>YAWL 命令:</gold>
+<yellow>/yawl add <player></yellow> - 永久将玩家添加到白名单。
+<yellow>/yawl add <player> <duration></yellow> - 临时添加玩家 (例如: 7d, 30d, 1mo, 1y)。
+<yellow>/yawl remove <player></yellow> - 从白名单移除玩家。
+<yellow>/yawl list</yellow> - 列出所有白名单玩家。
 <yellow>/yawl reload</yellow> - 重新加载配置和白名单。
 """
 reload-success = "<green>白名单和配置已成功重新加载。</green>"
-cannot-remove-self = "<red>你不能将自己移出白名单！</red>"
+cannot-remove-self = "<red>你不能将自己从白名单中移除！</red>"

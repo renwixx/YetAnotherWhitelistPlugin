@@ -1,18 +1,21 @@
-# Плейсхолдери: <player>, <count>, <players>
-kick-message = "<red>Вас немає у вайтлисті цього сервера!</red>"
-player-added = "<gray>Гравця <green><player></green> додано до вайтлиста.</gray>"
-player-already-exists = "<gray>Гравець <yellow><player></yellow> вже є у вайтлисті.</gray>"
-player-removed = "<gray>Гравця <red><player></red> видалено з вайтлиста.</gray>"
-player-not-found = "<gray>Гравця <yellow><player></yellow> не знайдено у вайтлисті.</gray>"
-list-header = "<gold>Гравці у вайтлисті (<count>):</gold><white> <players>"
-list-empty = "<yellow>Вайтлист порожній.</yellow>"
-no-permission = "<red>У вас немає прав для цієї команди.</red>"
+# Змінні: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>Вас немає у вайтлісті цього сервера!</red>"
+player-added = "<gray>Гравця <green><player></green> додано до вайтліста.</gray>"
+player-added-temp = "<gray>Гравця <green><player></green> додано до вайтліста до <yellow><until></yellow>.</gray>"
+player-already-exists = "<gray>Гравець <yellow><player></yellow> вже є у вайтлісті.</gray>"
+player-removed = "<gray>Гравця <red><player></red> видалено з вайтліста.</gray>"
+player-not-found = "<gray>Гравця <yellow><player></yellow> немає у вайтлісті.</gray>"
+invalid-duration = "<red>Некоректна тривалість: <yellow><duration></yellow>. Приклади: 7d, 30d, 1mo, 1y</red>"
+list-header = "<gold>Гравці у вайтлісті (<count>):</gold><white> <players>"
+list-empty = "<yellow>Вайтліст порожній.</yellow>"
+no-permission = "<red>У вас немає прав для використання цієї команди.</red>"
 help-message = """
 <gold>Команди YAWL:</gold>
-<yellow>/yawl add <player></yellow> - Додати гравця у вайтлист.
-<yellow>/yawl remove <player></yellow> - Видалити гравця з вайтлиста.
-<yellow>/yawl list</yellow> - Показати список гравців у вайтлисті.
-<yellow>/yawl reload</yellow> - Перезавантажити конфігурацію та вайтлист.
+<yellow>/yawl add <player></yellow> - Додати гравця у вайтліст (назавжди).
+<yellow>/yawl add <player> <duration></yellow> - Додати гравця тимчасово (наприклад: 7d, 30d, 1mo, 1y).
+<yellow>/yawl remove <player></yellow> - Видалити гравця з вайтліста.
+<yellow>/yawl list</yellow> - Показати всіх гравців у вайтлісті.
+<yellow>/yawl reload</yellow> - Перезавантажити конфігурацію та вайтліст.
 """
-reload-success = "<green>Вайтлист і конфігурація успішно перезавантажені.</green>"
-cannot-remove-self = "<red>Ви не можете видалити самі себе з вайтлиста!</red>"
+reload-success = "<green>Вайтліст і конфігурації успішно перезавантажено.</green>"
+cannot-remove-self = "<red>Ви не можете видалити себе з вайтліста!</red>"

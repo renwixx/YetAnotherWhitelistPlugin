@@ -1,18 +1,21 @@
-# プレースホルダー: <player>, <count>, <players>
-kick-message = "<red>あなたはこのサーバーのホワイトリストに入っていません！</red>"
+# プレースホルダー: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>あなたはこのサーバーのホワイトリストに登録されていません！</red>"
 player-added = "<gray>プレイヤー <green><player></green> がホワイトリストに追加されました。</gray>"
-player-already-exists = "<gray>プレイヤー <yellow><player></yellow> は既にホワイトリストに存在します。</gray>"
+player-added-temp = "<gray>プレイヤー <green><player></green> が <yellow><until></yellow> までホワイトリストに追加されました。</gray>"
+player-already-exists = "<gray>プレイヤー <yellow><player></yellow> はすでにホワイトリストに存在します。</gray>"
 player-removed = "<gray>プレイヤー <red><player></red> がホワイトリストから削除されました。</gray>"
 player-not-found = "<gray>プレイヤー <yellow><player></yellow> はホワイトリストに存在しません。</gray>"
+invalid-duration = "<red>無効な期間: <yellow><duration></yellow>。例: 7d, 30d, 1mo, 1y</red>"
 list-header = "<gold>ホワイトリストのプレイヤー (<count>):</gold><white> <players>"
 list-empty = "<yellow>ホワイトリストは空です。</yellow>"
 no-permission = "<red>このコマンドを使用する権限がありません。</red>"
 help-message = """
 <gold>YAWL コマンド:</gold>
-<yellow>/yawl add <player></yellow> - プレイヤーをホワイトリストに追加します。
-<yellow>/yawl remove <player></yellow> - プレイヤーをホワイトリストから削除します。
-<yellow>/yawl list</yellow> - ホワイトリストの全プレイヤーを表示します。
-<yellow>/yawl reload</yellow> - 設定とホワイトリストを再読み込みします。
+<yellow>/yawl add <player></yellow> - プレイヤーを永続的にホワイトリストに追加。
+<yellow>/yawl add <player> <duration></yellow> - プレイヤーを一時的に追加 (例: 7d, 30d, 1mo, 1y)。
+<yellow>/yawl remove <player></yellow> - プレイヤーをホワイトリストから削除。
+<yellow>/yawl list</yellow> - ホワイトリストの全プレイヤーを表示。
+<yellow>/yawl reload</yellow> - 設定とホワイトリストをリロード。
 """
-reload-success = "<green>ホワイトリストと設定が正常に再読み込みされました。</green>"
+reload-success = "<green>ホワイトリストと設定が正常にリロードされました。</green>"
 cannot-remove-self = "<red>自分自身をホワイトリストから削除することはできません！</red>"

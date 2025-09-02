@@ -20,7 +20,7 @@ public class LocaleManager {
     private final Logger logger;
     private Toml messages;
     private static final List<String> SUPPORTED_LOCALES = List.of(
-            "en", "ru", "uk", "de", "fr", "es", "ar", "zh-cn", "ja"
+            "en", "ru", "uk", "de", "fr", "es", "ar", "zh-cn", "ja", "pt-br", "tr"
     );
 
     public LocaleManager(Path dataDirectory, Yawl plugin, String locale, Logger logger) {

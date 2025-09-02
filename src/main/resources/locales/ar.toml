@@ -1,15 +1,18 @@
-# العناصر النائبة: <player>, <count>, <players>
+# العناصر النائبة: <player>, <count>, <players>, <until>, <duration>
 kick-message = "<red>أنت لست في القائمة البيضاء لهذا الخادم!</red>"
 player-added = "<gray>تمت إضافة اللاعب <green><player></green> إلى القائمة البيضاء.</gray>"
+player-added-temp = "<gray>تمت إضافة اللاعب <green><player></green> إلى القائمة البيضاء حتى <yellow><until></yellow>.</gray>"
 player-already-exists = "<gray>اللاعب <yellow><player></yellow> موجود بالفعل في القائمة البيضاء.</gray>"
 player-removed = "<gray>تمت إزالة اللاعب <red><player></red> من القائمة البيضاء.</gray>"
 player-not-found = "<gray>اللاعب <yellow><player></yellow> غير موجود في القائمة البيضاء.</gray>"
+invalid-duration = "<red>مدة غير صالحة: <yellow><duration></yellow>. أمثلة: 7d, 30d, 1mo, 1y</red>"
 list-header = "<gold>اللاعبون في القائمة البيضاء (<count>):</gold><white> <players>"
 list-empty = "<yellow>القائمة البيضاء فارغة.</yellow>"
 no-permission = "<red>ليست لديك صلاحية لاستخدام هذا الأمر.</red>"
 help-message = """
 <gold>أوامر YAWL:</gold>
-<yellow>/yawl add <player></yellow> - يضيف لاعبًا إلى القائمة البيضاء.
+<yellow>/yawl add <player></yellow> - يضيف لاعبًا إلى القائمة البيضاء (بشكل دائم).
+<yellow>/yawl add <player> <duration></yellow> - يضيف لاعبًا مؤقتًا (مثل: 7d، 30d، 1mo، 1y).
 <yellow>/yawl remove <player></yellow> - يزيل لاعبًا من القائمة البيضاء.
 <yellow>/yawl list</yellow> - يعرض جميع اللاعبين في القائمة البيضاء.
 <yellow>/yawl reload</yellow> - يعيد تحميل الإعدادات والقائمة البيضاء.

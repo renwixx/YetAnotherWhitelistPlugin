@@ -1,18 +1,21 @@
-# Плейсхолдеры: <player>, <count>, <players>
-kick-message = "<red>Вы не в белом списке этого сервера!"
-player-added = "<gray>Игрок <green><player></green> был добавлен в белый список."
-player-already-exists = "<gray>Игрок <yellow><player></yellow> уже находится в белом списке."
-player-removed = "<gray>Игрок <red><player></red> был удален из белого списка."
-player-not-found = "<gray>Игрока <yellow><player></yellow> нет в белом списке."
-list-header = "<gold>Игроки в белом списке (<count>):</gold><white> <players>"
-list-empty = "<yellow>Белый список пуст."
-no-permission = "<red>У вас нет прав для использования этой команды."
+# Переменные: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>Вы не находитесь в вайтлисте этого сервера!</red>"
+player-added = "<gray>Игрок <green><player></green> был добавлен в вайтлист.</gray>"
+player-added-temp = "<gray>Игрок <green><player></green> был добавлен в вайтлист до <yellow><until></yellow>.</gray>"
+player-already-exists = "<gray>Игрок <yellow><player></yellow> уже есть в вайтлисте.</gray>"
+player-removed = "<gray>Игрок <red><player></red> был удалён из вайтлиста.</gray>"
+player-not-found = "<gray>Игрок <yellow><player></yellow> отсутствует в вайтлисте.</gray>"
+invalid-duration = "<red>Неверная длительность: <yellow><duration></yellow>. Примеры: 7d, 30d, 1mo, 1y</red>"
+list-header = "<gold>Игроки в вайтлисте (<count>):</gold><white> <players>"
+list-empty = "<yellow>Вайтлист пуст.</yellow>"
+no-permission = "<red>У вас нет прав для использования этой команды.</red>"
 help-message = """
 <gold>Команды YAWL:</gold>
-<yellow>/yawl add <игрок></yellow> - Добавить игрока в белый список.
-<yellow>/yawl remove <игрок></yellow> - Удалить игрока из белого списка.
-<yellow>/yawl list</yellow> - Показать всех игроков в белом списке.
-<yellow>/yawl reload</yellow> - Перезагрузить конфигурацию и белый список.
+<yellow>/yawl add <player></yellow> - Добавить игрока в вайтлист (навсегда).
+<yellow>/yawl add <player> <duration></yellow> - Добавить игрока временно (например: 7d, 30d, 1mo, 1y).
+<yellow>/yawl remove <player></yellow> - Удалить игрока из вайтлиста.
+<yellow>/yawl list</yellow> - Показать всех игроков в вайтлисте.
+<yellow>/yawl reload</yellow> - Перезагрузить конфигурацию и вайтлист.
 """
-reload-success = "<green>Белый список и конфигурации успешно перезагружены."
+reload-success = "<green>Вайтлист и конфигурации успешно перезагружены.</green>"
 cannot-remove-self = "<red>Вы не можете удалить сами себя из вайтлиста!</red>"

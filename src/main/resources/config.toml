@@ -18,3 +18,7 @@ use-client-locale = false
 # If false, case will be ignored ("Player" and "player" are the same).
 # It's recommended to keep this 'false' for user-friendliness.
 case-sensitive = false
+
+# Kick active player immediately after whitelist removal or expiry.
+# If false, the player will remain connected until they reconnect or reload occurs.
+kick-active-on-revoke = true

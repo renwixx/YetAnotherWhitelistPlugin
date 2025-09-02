@@ -1,0 +1,21 @@
+# Değişkenler: <player>, <count>, <players>, <until>, <duration>
+kick-message = "<red>Bu sunucunun beyaz listesinde değilsiniz!</red>"
+player-added = "<gray><green><player></green> beyaz listeye eklendi.</gray>"
+player-added-temp = "<gray><green><player></green>, <yellow><until></yellow> tarihine kadar beyaz listeye eklendi.</gray>"
+player-already-exists = "<gray><yellow><player></yellow> zaten beyaz listede.</gray>"
+player-removed = "<gray><red><player></red> beyaz listeden çıkarıldı.</gray>"
+player-not-found = "<gray><yellow><player></yellow> beyaz listede bulunamadı.</gray>"
+invalid-duration = "<red>Geçersiz süre: <yellow><duration></yellow>. Örnekler: 7d, 30d, 1mo, 1y</red>"
+list-header = "<gold>Beyaz listedeki oyuncular (<count>):</gold><white> <players>"
+list-empty = "<yellow>Beyaz liste boş.</yellow>"
+no-permission = "<red>Bu komutu kullanma izniniz yok.</red>"
+help-message = """
+<gold>YAWL Komutları:</gold>
+<yellow>/yawl add <player></yellow> - Oyuncuyu kalıcı olarak beyaz listeye ekler.
+<yellow>/yawl add <player> <duration></yellow> - Oyuncuyu geçici olarak ekler (örn: 7d, 30d, 1mo, 1y).
+<yellow>/yawl remove <player></yellow> - Oyuncuyu beyaz listeden çıkarır.
+<yellow>/yawl list</yellow> - Beyaz listedeki tüm oyuncuları gösterir.
+<yellow>/yawl reload</yellow> - Yapılandırmayı ve beyaz listeyi yeniden yükler.
+"""
+reload-success = "<green>Beyaz liste ve yapılandırmalar başarıyla yeniden yüklendi.</green>"
+cannot-remove-self = "<red>Kendinizi beyaz listeden çıkaramazsınız!</red>"

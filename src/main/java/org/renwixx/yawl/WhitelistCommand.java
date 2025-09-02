@@ -10,12 +10,19 @@ import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.renwixx.yawl.util.DurationParser;
 import org.slf4j.Logger;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.StringJoiner;
 
 public final class WhitelistCommand {
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z").withZone(ZoneId.systemDefault());
 
     public static BrigadierCommand create(final Yawl plugin) {
         LiteralArgumentBuilder<CommandSource> builder = LiteralArgumentBuilder.<CommandSource>literal("yawl")
@@ -26,6 +33,43 @@ public final class WhitelistCommand {
 
         var addCommand = LiteralArgumentBuilder.<CommandSource>literal("add")
                 .then(RequiredArgumentBuilder.<CommandSource, String>argument("player", StringArgumentType.word())
+                        .then(RequiredArgumentBuilder.<CommandSource, String>argument("duration", StringArgumentType.greedyString())
+                                .suggests((ctx, sb) -> {
+                                    sb.suggest("7d");
+                                    sb.suggest("30d");
+                                    sb.suggest("1mo");
+                                    sb.suggest("1y");
+                                    return sb.buildFuture();
+                                })
+                                .executes(context -> {
+                                    CommandSource source = context.getSource();
+                                    LocaleManager locale = plugin.getLocaleManager();
+                                    if (!source.hasPermission(Permissions.ADD)) {
+                                        source.sendMessage(locale.getMessageFor(source, "no-permission"));
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+
+                                    String playerName = context.getArgument("player", String.class).trim();
+                                    String durationStr = context.getArgument("duration", String.class).trim();
+                                    var parsed = DurationParser.parse(durationStr);
+                                    if (parsed.isEmpty()) {
+                                        sendMessageToSource(source, locale.getMessageFor(source, "invalid-duration",
+                                                Placeholder.unparsed("duration", durationStr)), plugin);
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+                                    Duration dur = parsed.get();
+                                    boolean added = plugin.addPlayer(playerName, dur);
+                                    if (added) {
+                                        String until = DATE_FMT.format(Instant.now().plus(dur));
+                                        sendMessageToSource(source, locale.getMessageFor(source, "player-added-temp",
+                                                Placeholder.unparsed("player", playerName),
+                                                Placeholder.unparsed("until", until)), plugin);
+                                    } else {
+                                        sendMessageToSource(source, locale.getMessageFor(source, "player-already-exists",
+                                                Placeholder.unparsed("player", playerName)), plugin);
+                                    }
+                                    return Command.SINGLE_SUCCESS;
+                                }))
                         .executes(context -> {
                             CommandSource source = context.getSource();
                             LocaleManager locale = plugin.getLocaleManager();
