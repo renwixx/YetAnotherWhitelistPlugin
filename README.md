@@ -47,7 +47,18 @@ case-sensitive = false
 # Kick active player immediately after whitelist removal or expiry.
 # If false, the player will remain connected until they reconnect or reload occurs.
 kick-active-on-revoke = true
+
+# Placeholder reload interval in minutes
+placeholder-reload-interval = 2
 ```
+
+## 🆔 Placeholders
+Starting with version 1.2, you can use the `%yawl_duration%` placeholder, which contains the amount of time remaining for the player. To use placeholders, you need to install [YetAnotherWhitelistCompanion](https://github.com/renwixx/YetAnotherWhitelistCompanion) and [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) on your backend server(s).
+
+<img width="317" height="65" alt="image" src="https://github.com/user-attachments/assets/324a17f7-7823-4b67-824c-14c1edcb69b6" />
+<img width="317" height="65" alt="image" src="https://github.com/user-attachments/assets/06db7511-df7d-49ef-a690-b9c10ff0b793" />
+<img width="317" height="65" alt="image" src="https://github.com/user-attachments/assets/338d68c9-2003-41c1-a922-3436381522ad" />
+
 
 ## 💬 Commands
 
@@ -58,6 +69,7 @@ All commands start with `/yawl`.
 | `/yawl`                           | Displays the plugin help message.                   |
 | `/yawl add <player>`              | Adds a player to the whitelist.                     |
 | `/yawl add <player> [<duration>]` | Adds a player to the whitelist for a specific time. |
+| `/yawl extend <player> [<duration>] [add\|replace]` | Adds time for a specific player. If the white list timer has expired, it will suggest replacing the time based on the actual time or adding to the old time limit. |
 | `/yawl remove <player>`           | Removes a player from the whitelist.                |
 | `/yawl list`                      | Shows a list of all whitelisted players.            |
 | `/yawl reload`                    | Reloads the config and `whitelist.txt`.             |
@@ -70,6 +82,7 @@ Grant these permissions to your staff groups to control who can manage the white
 | ---------------------- | ------------------------------------------------------------- |
 | `yawl.bypass`          | Allows a player to join the server even if not on the whitelist. |
 | `yawl.command.add`     | Allows using the `/yawl add` command.                         |
+| `yawl.command.extend`  | Allows using the `/yawl extend` command.                      |
 | `yawl.command.remove`  | Allows using the `/yawl remove` command.                      |
 | `yawl.command.list`    | Allows using the `/yawl list` command.                        |
 | `yawl.command.reload`  | Allows using the `/yawl reload` command.                      |
