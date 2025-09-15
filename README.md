@@ -11,7 +11,7 @@ The core philosophy of YAWL is **simplicity**. In a world of complex plugins, YA
   * **⚡ Lightweight:** The plugin has a minimal footprint. It's written to be extremely efficient and won't add any bloat or lag to your proxy.
   * **✏️ Simple Text-Based Management:** All whitelisted players are stored in a simple `whitelist.txt` file. You can edit this file directly and reload the plugin in-game.
   * **⚙️ Straightforward Configuration:** A clean `config.toml` file allows you to toggle the whitelist, change message languages, and set case sensitivity with ease.
-  * **🌍 Multi-Language Support:** YAWL comes with multiple pre-packaged languages (`en`, `ar`, `de`, `es`, `fr`, `ja`, `ru`, `uk`, `zh-cn`). It can even **automatically display messages in a player's client language**\!
+  * **🌍 Multi-Language Support:** YAWL comes with multiple pre-packaged languages (`en`, `ar`, `de`, `es`, `fr`, `ja`, `ru`, `uk`, `zh-cn`, `pt-br`, `tr`). It can even **automatically display messages in a player's client language**\!
   * **🔄 Live Reload:** No need to restart your entire proxy. A simple command reloads the configuration and the whitelist instantly.
   * **🔒 Permissions-Ready:** Fine-grained permission nodes give you complete control over who can manage the whitelist.
 
@@ -28,31 +28,39 @@ The configuration is handled in the `plugins/yawl/config.toml` file.
 
 ```toml
 [settings]
-# Enable or disable the whitelist.
+# Enable or disable the whitelist. If false, the plugin will not kick anyone.
 enabled = true
 
-# Sets the default language for plugin messages (e.g., "en", "ru").
+# Sets the language for plugin messages.
+# Corresponds to a file name in the 'locales' folder (e.g., "en", "ru").
 locale = "en"
 
-# If true, the plugin will try to use the player's client language if a translation is available.
+# If true and the client has a language set that exists in the plugin's locales folder, it will be displayed.
+# If false, it will display default locale defined by upper setting.
 use-client-locale = false
 
-# If true, player names are case-sensitive ("Player" and "player" are different).
-# It is recommended to keep this 'false'.
+# If true, player names in the whitelist will be case-sensitive (e.g., "Player" is different from "player").
+# If false, case will be ignored ("Player" and "player" are the same).
+# It's recommended to keep this 'false' for user-friendliness.
 case-sensitive = false
+
+# Kick active player immediately after whitelist removal or expiry.
+# If false, the player will remain connected until they reconnect or reload occurs.
+kick-active-on-revoke = true
 ```
 
 ## 💬 Commands
 
 All commands start with `/yawl`.
 
-| Command                          | Description                               |
-| -------------------------------- | ----------------------------------------- |
-| `/yawl`                          | Displays the plugin help message.         |
-| `/yawl add <player>`             | Adds a player to the whitelist.           |
-| `/yawl remove <player>`          | Removes a player from the whitelist.      |
-| `/yawl list`                     | Shows a list of all whitelisted players.  |
-| `/yawl reload`                   | Reloads the config and `whitelist.txt`.   |
+| Command                           | Description                                         |
+| --------------------------------- | --------------------------------------------------- |
+| `/yawl`                           | Displays the plugin help message.                   |
+| `/yawl add <player>`              | Adds a player to the whitelist.                     |
+| `/yawl add <player> [<duration>]` | Adds a player to the whitelist for a specific time. |
+| `/yawl remove <player>`           | Removes a player from the whitelist.                |
+| `/yawl list`                      | Shows a list of all whitelisted players.            |
+| `/yawl reload`                    | Reloads the config and `whitelist.txt`.             |
 
 ## 🔑 Permissions
 
