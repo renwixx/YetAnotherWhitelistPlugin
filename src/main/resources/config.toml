@@ -22,3 +22,6 @@ case-sensitive = false
 # Kick active player immediately after whitelist removal or expiry.
 # If false, the player will remain connected until they reconnect or reload occurs.
 kick-active-on-revoke = true
+
+# Placeholder reload interval in minutes
+placeholder-reload-interval = 2

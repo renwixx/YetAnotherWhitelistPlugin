@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
 public class LocaleManager {
     private final Yawl plugin;
@@ -32,7 +33,6 @@ public class LocaleManager {
     }
 
     public void reload() {
-        // Save default locales if missing
         SUPPORTED_LOCALES.forEach(this::saveDefaultLocale);
 
         Path localeFile = localesDirectory.resolve(locale + ".toml");
@@ -70,31 +70,48 @@ public class LocaleManager {
         }
     }
 
-    public Component getMessageFor(CommandSource source, String key, TagResolver... placeholders) {
-        if (!plugin.shouldUseClientLocale()) {
-            return getMessage(key, placeholders);
+    private Toml getTomlFor(CommandSource source) {
+        if (!plugin.shouldUseClientLocale() || !(source instanceof Player player)) {
+            return this.messages;
         }
 
-        String lang = null;
+        Locale playerLocale = player.getPlayerSettings().getLocale();
+        if (playerLocale == null) {
+            return this.messages;
+        }
 
-        if (source instanceof Player player) {
-            if (player.getPlayerSettings().getLocale() != null) {
-                lang = player.getPlayerSettings().getLocale().getLanguage();
+        String langTag = playerLocale.toLanguageTag().toLowerCase(Locale.ROOT);
+        Path localeFile = localesDirectory.resolve(langTag + ".toml");
+
+        if (!Files.exists(localeFile)) {
+            String langCode = playerLocale.getLanguage().toLowerCase(Locale.ROOT);
+            if (!langTag.equals(langCode)) {
+                localeFile = localesDirectory.resolve(langCode + ".toml");
             }
         }
 
-        if (lang != null && Files.exists(localesDirectory.resolve(lang + ".toml"))) {
+        if (Files.exists(localeFile)) {
             try {
-                Toml localMessages = new Toml().read(localesDirectory.resolve(lang + ".toml").toFile());
-                String msg = localMessages.getString(key, messages.getString(key, key));
-                return Yawl.MINI_MESSAGE.deserialize(msg, placeholders);
+                return new Toml().read(localeFile.toFile());
             } catch (Exception e) {
-                logger.warn("Failed to load messages for '{}', using default locale.", lang, e);
+                logger.warn("Failed to load messages for locale '{}', using default.", playerLocale.toLanguageTag(), e);
             }
         }
 
-        return getMessage(key, placeholders);
+        return this.messages;
     }
+
+    public Component getMessageFor(CommandSource source, String key, TagResolver... placeholders) {
+        Toml specificMessages = getTomlFor(source);
+        String msg = specificMessages.getString(key, messages.getString(key, "<red>Missing message for key: " + key + "</red>"));
+        return Yawl.MINI_MESSAGE.deserialize(msg, placeholders);
+    }
+
+    public String getMessageStringFor(CommandSource source, String key) {
+        Toml specificMessages = getTomlFor(source);
+        return specificMessages.getString(key, messages.getString(key, key));
+    }
+
 
     public String getMessageString(String key) {
         return messages.getString(key, "<red>Missing message for key: " + key + "</red>");

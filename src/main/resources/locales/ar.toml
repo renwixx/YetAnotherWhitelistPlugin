@@ -13,9 +13,27 @@ help-message = """
 <gold>أوامر YAWL:</gold>
 <yellow>/yawl add <player></yellow> - يضيف لاعبًا إلى القائمة البيضاء (بشكل دائم).
 <yellow>/yawl add <player> <duration></yellow> - يضيف لاعبًا مؤقتًا (مثل: 7d، 30d، 1mo، 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - يضيف وقتًا إلى المدة النشطة؛ إذا انتهت، ستظهر لك خيارات.
 <yellow>/yawl remove <player></yellow> - يزيل لاعبًا من القائمة البيضاء.
 <yellow>/yawl list</yellow> - يعرض جميع اللاعبين في القائمة البيضاء.
 <yellow>/yawl reload</yellow> - يعيد تحميل الإعدادات والقائمة البيضاء.
 """
 reload-success = "<green>تمت إعادة تحميل القائمة البيضاء والإعدادات بنجاح.</green>"
 cannot-remove-self = "<red>لا يمكنك إزالة نفسك من القائمة البيضاء!</red>"
+
+# رسائل ميزة التمديد
+player-extended-add = "<gray>تمت إضافة <yellow><duration></yellow> إلى <green><player></green>. انتهاء جديد: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>تم تحديث مدة <green><player></green> حتى <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>انتهت مدة اللاعب <yellow><player></yellow> في <yellow><expired></yellow>. اختر:</gray>"
+extend-button-add = "<green>[إضافة]</green>"
+extend-button-replace = "<gold>[استبدال]</gold>"
+extend-button-add-hover = "<gray>انقر لإضافة وقت استنادًا إلى تاريخ الانتهاء السابق.</gray>"
+extend-button-replace-hover = "<gray>انقر لتعيين مدة جديدة بدءًا من الآن.</gray>"
+
+# العناصر النائبة
+placeholder-expired = "منتهي الصلاحية"
+placeholder-permanent = "دائم"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "جار التحميل..."

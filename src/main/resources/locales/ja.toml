@@ -13,9 +13,27 @@ help-message = """
 <gold>YAWL コマンド:</gold>
 <yellow>/yawl add <player></yellow> - プレイヤーを永続的にホワイトリストに追加。
 <yellow>/yawl add <player> <duration></yellow> - プレイヤーを一時的に追加 (例: 7d, 30d, 1mo, 1y)。
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - アクティブな期限に時間を追加します。期限切れの場合は選択を促します。
 <yellow>/yawl remove <player></yellow> - プレイヤーをホワイトリストから削除。
 <yellow>/yawl list</yellow> - ホワイトリストの全プレイヤーを表示。
 <yellow>/yawl reload</yellow> - 設定とホワイトリストをリロード。
 """
 reload-success = "<green>ホワイトリストと設定が正常にリロードされました。</green>"
 cannot-remove-self = "<red>自分自身をホワイトリストから削除することはできません！</red>"
+
+# 期限延長機能のメッセージ
+player-extended-add = "<gray><green><player></green> に <yellow><duration></yellow> を追加しました。新しい有効期限: <yellow><until></yellow>。</gray>"
+player-extended-replace = "<gray><green><player></green> の期限を <yellow><until></yellow> まで更新しました。</gray>"
+extend-expired-title = "<gray>プレイヤー <yellow><player></yellow> は <yellow><expired></yellow> に期限切れになりました。選択してください:</gray>"
+extend-button-add = "<green>[追加]</green>"
+extend-button-replace = "<gold>[置き換え]</gold>"
+extend-button-add-hover = "<gray>以前の有効期限に基づいて時間を追加するにはクリック。</gray>"
+extend-button-replace-hover = "<gray>今から始まる新しい期限を設定するにはクリック。</gray>"
+
+# プレースホルダー
+placeholder-expired = "期限切れ"
+placeholder-permanent = "無期限"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "読み込み中..."

@@ -13,9 +13,27 @@ help-message = """
 <gold>YAWL 命令:</gold>
 <yellow>/yawl add <player></yellow> - 永久将玩家添加到白名单。
 <yellow>/yawl add <player> <duration></yellow> - 临时添加玩家 (例如: 7d, 30d, 1mo, 1y)。
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - 为当前期限增加时间；如果已过期，将提示你选择。
 <yellow>/yawl remove <player></yellow> - 从白名单移除玩家。
 <yellow>/yawl list</yellow> - 列出所有白名单玩家。
 <yellow>/yawl reload</yellow> - 重新加载配置和白名单。
 """
 reload-success = "<green>白名单和配置已成功重新加载。</green>"
 cannot-remove-self = "<red>你不能将自己从白名单中移除！</red>"
+
+# 扩展功能消息
+player-extended-add = "<gray>已为 <green><player></green> 增加 <yellow><duration></yellow>。新的到期时间：<yellow><until></yellow>。</gray>"
+player-extended-replace = "<gray>已将 <green><player></green> 的期限更新至 <yellow><until></yellow>。</gray>"
+extend-expired-title = "<gray>玩家 <yellow><player></yellow> 已于 <yellow><expired></yellow> 过期。请选择：</gray>"
+extend-button-add = "<green>[添加]</green>"
+extend-button-replace = "<gold>[替换]</gold>"
+extend-button-add-hover = "<gray>点击以基于之前的到期时间添加时长。</gray>"
+extend-button-replace-hover = "<gray>点击以从现在开始设置新的期限。</gray>"
+
+# 占位符
+placeholder-expired = "已过期"
+placeholder-permanent = "永久"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "加载中..."

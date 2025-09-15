@@ -13,9 +13,27 @@ help-message = """
 <gold>YAWL Komutları:</gold>
 <yellow>/yawl add <player></yellow> - Oyuncuyu kalıcı olarak beyaz listeye ekler.
 <yellow>/yawl add <player> <duration></yellow> - Oyuncuyu geçici olarak ekler (örn: 7d, 30d, 1mo, 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Aktif süreye zaman ekler; süresi dolmuşsa seçim yapmanız istenir.
 <yellow>/yawl remove <player></yellow> - Oyuncuyu beyaz listeden çıkarır.
 <yellow>/yawl list</yellow> - Beyaz listedeki tüm oyuncuları gösterir.
 <yellow>/yawl reload</yellow> - Yapılandırmayı ve beyaz listeyi yeniden yükler.
 """
 reload-success = "<green>Beyaz liste ve yapılandırmalar başarıyla yeniden yüklendi.</green>"
 cannot-remove-self = "<red>Kendinizi beyaz listeden çıkaramazsınız!</red>"
+
+# Uzatma özelliği için mesajlar
+player-extended-add = "<gray><green><player></green> için <yellow><duration></yellow> eklendi. Yeni sona erme: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray><green><player></green> için süre <yellow><until></yellow> tarihine güncellendi.</gray>"
+extend-expired-title = "<gray><yellow><player></yellow> oyuncusunun süresi <yellow><expired></yellow> tarihinde dolmuş. Seçin:</gray>"
+extend-button-add = "<green>[Ekle]</green>"
+extend-button-replace = "<gold>[Değiştir]</gold>"
+extend-button-add-hover = "<gray>Önceki sona erme tarihine göre süre eklemek için tıklayın.</gray>"
+extend-button-replace-hover = "<gray>Şu andan itibaren başlayacak yeni bir süre ayarlamak için tıklayın.</gray>"
+
+# Yer tutucular
+placeholder-expired = "Süresi Doldu"
+placeholder-permanent = "Kalıcı"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "Yükleniyor..."

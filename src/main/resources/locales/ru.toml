@@ -13,9 +13,27 @@ help-message = """
 <gold>Команды YAWL:</gold>
 <yellow>/yawl add <player></yellow> - Добавить игрока в вайтлист (навсегда).
 <yellow>/yawl add <player> <duration></yellow> - Добавить игрока временно (например: 7d, 30d, 1mo, 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Добавляет время к активному сроку; если срок истёк, будет предложен выбор.
 <yellow>/yawl remove <player></yellow> - Удалить игрока из вайтлиста.
 <yellow>/yawl list</yellow> - Показать всех игроков в вайтлисте.
 <yellow>/yawl reload</yellow> - Перезагрузить конфигурацию и вайтлист.
 """
 reload-success = "<green>Вайтлист и конфигурации успешно перезагружены.</green>"
 cannot-remove-self = "<red>Вы не можете удалить сами себя из вайтлиста!</red>"
+
+# Сообщения для функции продления
+player-extended-add = "<gray>Добавлено <yellow><duration></yellow> для <green><player></green>. Новая дата истечения: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>Срок для <green><player></green> обновлён до <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>Срок игрока <yellow><player></yellow> истёк в <yellow><expired></yellow>. Выберите:</gray>"
+extend-button-add = "<green>[Добавить]</green>"
+extend-button-replace = "<gold>[Заменить]</gold>"
+extend-button-add-hover = "<gray>Нажмите, чтобы добавить время от предыдущей даты истечения.</gray>"
+extend-button-replace-hover = "<gray>Нажмите, чтобы установить новый срок, начиная с текущего момента.</gray>"
+
+# Заполнители
+placeholder-expired = "Истекло"
+placeholder-permanent = "Навсегда"
+placeholder-days = "д"
+placeholder-hrs = "ч"
+placeholder-mins = "м"
+placeholder-na = "Загрузка..."

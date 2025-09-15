@@ -35,6 +35,7 @@ public class Yawl {
 
     public static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
+    private VelocityToBackendBridge velocityToBackendBridge;
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
@@ -44,6 +45,7 @@ public class Yawl {
     private LocaleManager localeManager;
     private FileWhitelistStorage storage;
     private ScheduledTask expiryTask;
+    private ScheduledTask placeholderUpdateTask;
 
     @Inject
     public Yawl(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -58,8 +60,11 @@ public class Yawl {
 
         server.getEventManager().register(this, new ConnectionListener(this));
 
+        this.velocityToBackendBridge = new VelocityToBackendBridge(this, localeManager);
+        server.getEventManager().register(this, this.velocityToBackendBridge);
+
         CommandManager commandManager = server.getCommandManager();
-        BrigadierCommand yawlCommand = WhitelistCommand.create(this);
+        BrigadierCommand yawlCommand = WhitelistCommand.create(this, this.velocityToBackendBridge);
         commandManager.register(commandManager.metaBuilder("yawl").build(), yawlCommand);
 
         logger.info("YAWL (Yet Another Whitelist Plugin) has been enabled!");
@@ -71,6 +76,9 @@ public class Yawl {
             if (expiryTask != null) {
                 expiryTask.cancel();
                 expiryTask = null;
+            }
+            if (placeholderUpdateTask != null) {
+                placeholderUpdateTask.cancel();
             }
             if (storage != null) {
                 storage.flush(whitelistedPlayers);
@@ -90,15 +98,12 @@ public class Yawl {
             this.localeManager.setLocale(config.getLocale());
         }
 
-        // Инициализация хранилища (только файл)
         try {
             storage = new FileWhitelistStorage(dataDirectory.resolve("whitelist.txt"), dataDirectory, logger);
             storage.init();
             whitelistedPlayers.clear();
-            // Загружаем и перекладываем с учетом каноникализации
             Map<String, WhitelistEntry> loaded = storage.loadAll();
             for (WhitelistEntry e : loaded.values()) {
-                // перекладываем ключ в соответствие с текущей настройкой case-sensitive
                 String canonNow = canonical(e.getOriginalName());
                 whitelistedPlayers.put(canonNow, new WhitelistEntry(canonNow, e.getOriginalName(), e.getExpiresAtMillis()));
             }
@@ -110,6 +115,25 @@ public class Yawl {
         removeExpiredEntriesAndMaybeKick(false);
         checkAndKickNonWhitelistedPlayers();
         scheduleExpirySweep();
+        schedulePlaceholderUpdates();
+    }
+
+    private void schedulePlaceholderUpdates() {
+        try {
+            if (placeholderUpdateTask != null) {
+                placeholderUpdateTask.cancel();
+            }
+        } catch (Exception ignored) {}
+
+        placeholderUpdateTask = server.getScheduler()
+                .buildTask(this, () -> {
+                    if (velocityToBackendBridge == null) return;
+                    for (Player player : server.getAllPlayers()) {
+                        velocityToBackendBridge.sendWhitelistUpdate(player);
+                    }
+                })
+                .repeat(Duration.ofMinutes(config.getPlaceholderReloadInterval()))
+                .schedule();
     }
 
     private void scheduleExpirySweep() {
@@ -147,25 +171,12 @@ public class Yawl {
     public boolean isWhitelisted(String playerName) {
         WhitelistEntry entry = whitelistedPlayers.get(canonical(playerName));
         if (entry == null) return false;
-        if (entry.isExpired()) {
-            // Снять истекшую запись
-            whitelistedPlayers.remove(entry.getCanonicalName());
-            try {
-                if (storage != null) {
-                    storage.flush(whitelistedPlayers);
-                }
-            } catch (Exception e) {
-                logger.warn("Failed to persist removal of expired entry '{}'", entry.getOriginalName(), e);
-            }
-            return false;
-        }
-        return true;
+        return !entry.isExpired();
     }
 
     public List<String> getWhitelistedPlayers() {
-        // Только актуальные
-        removeExpiredEntriesAndMaybeKick(false);
         return whitelistedPlayers.values().stream()
+                .filter(e -> !e.isExpired())
                 .sorted(Comparator.comparing(WhitelistEntry::getOriginalName, String.CASE_INSENSITIVE_ORDER))
                 .map(WhitelistEntry::getOriginalName)
                 .toList();
@@ -178,6 +189,33 @@ public class Yawl {
     public boolean addPlayer(String playerName, Duration duration) {
         Long expiresAt = duration == null ? null : Instant.now().plus(duration).toEpochMilli();
         return addPlayerInternal(playerName, expiresAt);
+    }
+
+    public Optional<WhitelistEntry> getEntry(String playerName) {
+        String processed = playerName.trim();
+        if (processed.isEmpty()) return Optional.empty();
+        String canonical = canonical(processed);
+        return Optional.ofNullable(whitelistedPlayers.get(canonical));
+    }
+
+    public boolean updatePlayerExpiry(String playerName, Long expiresAtMillis) {
+        String processed = playerName.trim();
+        if (processed.isEmpty()) return false;
+        String canonical = canonical(processed);
+        WhitelistEntry old = whitelistedPlayers.get(canonical);
+        if (old == null) {
+            return false;
+        }
+        WhitelistEntry updated = new WhitelistEntry(canonical, old.getOriginalName(), expiresAtMillis);
+        whitelistedPlayers.put(canonical, updated);
+        try {
+            if (storage != null) {
+                storage.flush(whitelistedPlayers);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to update whitelist entry for {}", processed, e);
+        }
+        return true;
     }
 
     private boolean addPlayerInternal(String playerName, Long expiresAtMillis) {
@@ -197,7 +235,6 @@ public class Yawl {
             }
             return true;
         } else {
-            // Если уже есть, но хотим обновить срок — перезапишем, если пришел новый expires
             if (!Objects.equals(old.getExpiresAtMillis(), expiresAtMillis) && expiresAtMillis != null) {
                 whitelistedPlayers.put(canonical, newEntry);
                 try {
@@ -237,36 +274,25 @@ public class Yawl {
     }
 
     private void removeExpiredEntriesAndMaybeKick(boolean kickActive) {
-        boolean changed = false;
-        for (Iterator<Map.Entry<String, WhitelistEntry>> it = whitelistedPlayers.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<String, WhitelistEntry> e = it.next();
-            WhitelistEntry value = e.getValue();
-            if (value.isExpired()) {
-                it.remove();
-                if (kickActive && config.isEnabled()) {
-                    server.getPlayer(value.getOriginalName()).ifPresent(player -> {
-                        if (!player.hasPermission(Permissions.BYPASS)) {
-                            player.disconnect(localeManager.getMessage("kick-message"));
-                            logger.info("Kicked player {} because their whitelist access expired.", player.getUsername());
-                        }
-                    });
-                }
-                changed = true;
-            }
+        if (!kickActive || !config.isEnabled()) {
+            return;
         }
-        if (changed) {
-            try {
-                if (storage != null) {
-                    storage.flush(whitelistedPlayers);
-                }
-            } catch (Exception e) {
-                logger.warn("Failed to flush storage after expired entries cleanup", e);
+        for (WhitelistEntry value : whitelistedPlayers.values()) {
+            if (value.isExpired()) {
+                server.getPlayer(value.getOriginalName()).ifPresent(player -> {
+                    if (!player.hasPermission(Permissions.BYPASS)) {
+                        player.disconnect(localeManager.getMessage("kick-message"));
+                        logger.info("Kicked player {} because their whitelist access expired.", player.getUsername());
+                    }
+                });
             }
         }
     }
 
+    public VelocityToBackendBridge getVelocityToBackendBridge() { return velocityToBackendBridge; }
     public LocaleManager getLocaleManager() { return localeManager; }
     public boolean shouldUseClientLocale() { return useClientLocale; }
     public PluginConfig getConfig() { return config; }
     public Logger getLogger() { return logger; }
+    public ProxyServer getServer() { return server; }
 }

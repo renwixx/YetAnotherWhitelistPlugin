@@ -13,9 +13,27 @@ help-message = """
 <gold>YAWL Commands:</gold>
 <yellow>/yawl add <player></yellow> - Adds a player to the whitelist (permanent).
 <yellow>/yawl add <player> <duration></yellow> - Adds a player temporarily (e.g., 7d, 30d, 1mo, 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Adds time to an active term; if expired, you'll be prompted.
 <yellow>/yawl remove <player></yellow> - Removes a player from the whitelist.
 <yellow>/yawl list</yellow> - Lists all whitelisted players.
 <yellow>/yawl reload</yellow> - Reloads the plugin configuration and whitelist.
 """
 reload-success = "<green>Whitelist and configurations reloaded successfully."
 cannot-remove-self = "<red>You cannot remove yourself from the whitelist!</red>"
+
+# Messages for extend feature
+player-extended-add = "<gray>Added <yellow><duration></yellow> to <green><player></green>. New expiry: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>Updated term for <green><player></green> until <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>Player <yellow><player></yellow> has expired at <yellow><expired></yellow>. Choose:</gray>"
+extend-button-add = "<green>[Add]</green>"
+extend-button-replace = "<gold>[Replace]</gold>"
+extend-button-add-hover = "<gray>Click to add time based on previous expiry.</gray>"
+extend-button-replace-hover = "<gray>Click to set a new term starting from now.</gray>"
+
+# Placeholder
+placeholder-expired = "Expired"
+placeholder-permanent = "Permanent"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "Loading..."

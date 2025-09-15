@@ -14,7 +14,6 @@ public final class DurationParser {
     public static Optional<Duration> parse(String input) {
         if (input == null || input.isBlank()) return Optional.empty();
         String s = input.trim();
-        // ISO-8601 Duration
         if (s.startsWith("P") || s.startsWith("p")) {
             try {
                 return Optional.of(Duration.parse(s.toUpperCase(Locale.ROOT)));

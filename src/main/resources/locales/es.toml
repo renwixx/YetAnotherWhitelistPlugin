@@ -13,9 +13,35 @@ help-message = """
 <gold>Comandos de YAWL:</gold>
 <yellow>/yawl add <player></yellow> - Añade un jugador permanentemente a la whitelist.
 <yellow>/yawl add <player> <duration></yellow> - Añade un jugador temporalmente (ej.: 7d, 30d, 1mo, 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Agrega tiempo al período activo; si está expirado, se te pedirá elegir.
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Agrega tiempo al período activo; si está expirado, se te pedirá elegir.
 <yellow>/yawl remove <player></yellow> - Elimina un jugador de la whitelist.
 <yellow>/yawl list</yellow> - Muestra todos los jugadores en la whitelist.
 <yellow>/yawl reload</yellow> - Recarga la configuración y la whitelist.
 """
 reload-success = "<green>Whitelist y configuración recargadas con éxito.</green>"
 cannot-remove-self = "<red>¡No puedes eliminarte a ti mismo de la whitelist!</red>"
+player-extended-add = "<gray>Añadido <yellow><duration></yellow> a <green><player></green>. Nueva expiración: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>Período de <green><player></green> actualizado hasta <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>El jugador <yellow><player></yellow> expiró el <yellow><expired></yellow>. Elige:</gray>"
+extend-button-add = "<green>[Añadir]</green>"
+extend-button-replace = "<gold>[Reemplazar]</gold>"
+extend-button-add-hover = "<gray>Haz clic para agregar tiempo según la expiración anterior.</gray>"
+extend-button-replace-hover = "<gray>Haz clic para establecer un nuevo período a partir de ahora.</gray>"
+
+# Mensajes para la función de extensión
+player-extended-add = "<gray>Añadido <yellow><duration></yellow> a <green><player></green>. Nueva expiración: <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>Período de <green><player></green> actualizado hasta <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>El jugador <yellow><player></yellow> expiró el <yellow><expired></yellow>. Elige:</gray>"
+extend-button-add = "<green>[Añadir]</green>"
+extend-button-replace = "<gold>[Reemplazar]</gold>"
+extend-button-add-hover = "<gray>Haz clic para agregar tiempo según la expiración anterior.</gray>"
+extend-button-replace-hover = "<gray>Haz clic para establecer un nuevo período a partir de ahora.</gray>"
+
+# Marcadores de posición
+placeholder-expired = "Expirado"
+placeholder-permanent = "Permanente"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "Cargando..."

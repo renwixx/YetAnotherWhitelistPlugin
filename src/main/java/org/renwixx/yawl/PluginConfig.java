@@ -14,6 +14,7 @@ public class PluginConfig {
     private final boolean caseSensitive;
     private final boolean useClientLocale;
     private final boolean kickActiveOnRevoke;
+    private final long placeholderReloadInterval;
 
     public PluginConfig(Path dataDirectory, Logger logger) {
         Path configFile = saveDefaultConfig(dataDirectory, logger);
@@ -29,6 +30,7 @@ public class PluginConfig {
         this.caseSensitive = toml.getBoolean("settings.case-sensitive", false);
         this.useClientLocale = toml.getBoolean("settings.use-client-locale", false);
         this.kickActiveOnRevoke = toml.getBoolean("settings.kick-active-on-revoke", true);
+        this.placeholderReloadInterval = toml.getLong("settings.placeholder-reload-interval", 2L);
     }
 
     private Path saveDefaultConfig(Path dataDirectory, Logger logger) {
@@ -54,20 +56,19 @@ public class PluginConfig {
     public boolean isEnabled() {
         return enabled;
     }
-
     public String getLocale() {
         return locale;
     }
-
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
-
     public boolean isUseClientLocale() {
         return useClientLocale;
     }
-
     public boolean isKickActiveOnRevoke() {
         return kickActiveOnRevoke;
+    }
+    public long getPlaceholderReloadInterval() {
+        return placeholderReloadInterval;
     }
 }

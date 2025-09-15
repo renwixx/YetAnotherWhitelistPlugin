@@ -6,7 +6,7 @@ import java.util.Objects;
 public final class WhitelistEntry {
     private final String canonicalName;
     private final String originalName;
-    private final Long expiresAtMillis; // null = бессрочно
+    private final Long expiresAtMillis;
 
     public WhitelistEntry(String canonicalName, String originalName, Long expiresAtMillis) {
         this.canonicalName = Objects.requireNonNull(canonicalName, "canonicalName");

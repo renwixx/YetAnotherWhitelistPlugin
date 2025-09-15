@@ -13,9 +13,27 @@ help-message = """
 <gold>Commandes YAWL :</gold>
 <yellow>/yawl add <player></yellow> - Ajoute un joueur à la whitelist (permanent).
 <yellow>/yawl add <player> <duration></yellow> - Ajoute un joueur temporairement (ex. : 7d, 30d, 1mo, 1y).
+<yellow>/yawl extend <player> <duration> [add|replace]</yellow> - Ajoute du temps au terme actif ; s'il est expiré, un choix vous sera proposé.
 <yellow>/yawl remove <player></yellow> - Retire un joueur de la whitelist.
 <yellow>/yawl list</yellow> - Affiche tous les joueurs en whitelist.
 <yellow>/yawl reload</yellow> - Recharge la configuration et la whitelist.
 """
 reload-success = "<green>Whitelist et configuration rechargées avec succès.</green>"
 cannot-remove-self = "<red>Vous ne pouvez pas vous retirer vous-même de la whitelist !</red>"
+
+# Messages pour la fonctionnalité d'extension
+player-extended-add = "<gray>Ajout de <yellow><duration></yellow> à <green><player></green>. Nouvelle expiration : <yellow><until></yellow>.</gray>"
+player-extended-replace = "<gray>Terme de <green><player></green> mis à jour jusqu'au <yellow><until></yellow>.</gray>"
+extend-expired-title = "<gray>Le joueur <yellow><player></yellow> a expiré le <yellow><expired></yellow>. Choisissez :</gray>"
+extend-button-add = "<green>[Ajouter]</green>"
+extend-button-replace = "<gold>[Remplacer]</gold>"
+extend-button-add-hover = "<gray>Cliquez pour ajouter du temps basé sur l'ancienne date d'expiration.</gray>"
+extend-button-replace-hover = "<gray>Cliquez pour définir un nouveau terme à partir de maintenant.</gray>"
+
+# Variables de remplacement
+placeholder-expired = "Expiré"
+placeholder-permanent = "Permanent"
+placeholder-days = "d"
+placeholder-hrs = "h"
+placeholder-mins = "m"
+placeholder-na = "Chargement..."
